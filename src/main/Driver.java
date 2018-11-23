@@ -5,7 +5,7 @@ import java.awt.Robot;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
-import TaskDriver.Task;
+import TaskDriver.Lin;
 import gui.Frame;
 import mouse.Mouse;
 import system.Software;

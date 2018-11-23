@@ -9,12 +9,12 @@ import constants.KeyboardCostants;
 import keyboards.Keyboard;
 import system.Software;
 
-public class Task extends Thread {
+public class Lin extends Thread {
 	private ArrayList<String> tasks;
 	private Robot lin;
 	private boolean occupied;
 	
-	public Task() {
+	public Lin() {
 		occupied = false;
 		tasks = new ArrayList<String>(5);
 		initializeLin();
@@ -23,12 +23,15 @@ public class Task extends Thread {
 
 	private void performTasks() throws InterruptedException {
 		for (String nextTask : this.tasks) {
-			String[] taskDetail = nextTask.split(", ");
-			if (taskDetail[0].equals("mouse")) {
+			String[] taskDetail = nextTask.split(",");
+			if (taskDetail[0].trim().equals("mouse")) {
 				//System.out.println("Clicking mouse");
 				// Mouse.clickMouse(lin, MouseConstants.left_key);
 				Keyboard.clickKey(lin, KeyboardCostants.No1);
-				Software.hold(100);
+			}
+			else if(taskDetail[0].trim().equalsIgnoreCase("sleep")) {
+				int interval = Integer.parseInt(taskDetail[1]);
+				Software.hold(interval);
 			}
 		}
 	}

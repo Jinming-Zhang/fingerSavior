@@ -1,30 +1,32 @@
 package gui;
 
-import TaskDriver.Task;
+import TaskDriver.Lin;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import javafx.event.EventHandler;
 import javafx.scene.input.*;
 import javafx.scene.layout.GridPane;
+import javafx.scene.text.Text;
 import javafx.scene.*;
 import javafx.scene.control.*;
 
 public class Frame extends Application {
 	// elements in the frame
-	private Task LinDriver;
+	private Lin lin;
 	
 	public Button mouse, keyNo1;
 	public Button terminate;
 
-	private boolean tasking;
-
+	public Text restTimeLabel;
+	public TextField restTime;
 	private void initialize() {
 		mouse = new Button("Click Left Key");
 		keyNo1 = new Button("Click number 1");
 		terminate = new Button("Terminat tasks");
+		restTimeLabel = new Text("Rest Time");
+		restTime = new TextField("100");
 		
-		LinDriver = new Task();
-		tasking = false;
+		lin = new Lin();
 	}
 
 	@Override
@@ -38,6 +40,8 @@ public class Frame extends Application {
 		root.setMinSize(600, 300);
 		root.add(keyNo1, 0, 0);
 		root.add(terminate, 0, 1);
+		root.add(restTimeLabel, 3, 0);
+		root.add(restTime, 3, 1);
 		// Scene
 		Scene scene = new Scene(root, 600, 300);
 		// Stage
@@ -47,7 +51,7 @@ public class Frame extends Application {
 
 	@Override
 	public void stop() {
-		LinDriver.interrupt();
+		lin.interrupt();
 		System.exit(0);
 	}
 
@@ -56,11 +60,15 @@ public class Frame extends Application {
 		keyNo1.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
-				//LinDriver.interrupt();
-				System.out.println("calling press key " + LinDriver.getState().toString());
-				LinDriver = new Task();
-				System.out.println("State of Lin: " + LinDriver.getState().toString());
-				LinDriver.start();
+				String linState = lin.getState().toString();
+				System.out.println("State of Lin: " + linState);
+				//if(!linState.equals("TERMINATED")) {
+					lin.interrupt();
+				//}
+				lin = new Lin();
+				// add tasks
+				lin.addTask("sleep," + restTime.getText());
+				lin.start();
 			}
 		});
 	}
@@ -80,7 +88,7 @@ public class Frame extends Application {
 		terminate.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
-					LinDriver.interrupt();
+					lin.interrupt();
 			}
 		});
 	}
