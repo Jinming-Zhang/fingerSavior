@@ -78,4 +78,13 @@ public class Lin extends Thread {
 		System.out.println("Hi I'm " + this.getState().toString());
 		return this.getState().toString();
 	}
+	
+	public String myTasks() {
+		String result = "";
+		for (String nextTask: this.tasks) {
+			result += nextTask;
+			result += "\n";
+		}
+		return result;
+	}
 }
