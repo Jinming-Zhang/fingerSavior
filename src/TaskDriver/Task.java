@@ -5,52 +5,69 @@ import java.awt.Robot;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
+import constants.KeyboardCostants;
 import keyboards.Keyboard;
 import system.Software;
-import constants.MouseConstants;
-import mouse.Mouse;
 
+public class Task extends Thread {
+	private ArrayList<String> tasks;
+	private Robot lin;
+	private boolean occupied;
+	
+	public Task() {
+		occupied = false;
+		tasks = new ArrayList<String>(5);
+		initializeLin();
+		tasks.add("mouse, click, 10");
+	}
 
-public class Task implements Runnable{
-  public boolean running;
-  private ArrayList<String> tasks;
-  private Robot lin;
-  
-  public Task(){
-    tasks = new ArrayList<String>(5);
-    initializeLin();
-    running = false;
-    tasks.add("mouse, click, 10");
-  }
-  
-  private void performTasks(){
-    for(String nextTask: this.tasks){
-      String [] taskDetail = nextTask.split(", ");
-      if(taskDetail[0].equals("mouse")){
-        System.out.println("Clicking mouse");
-        //Mouse.clickMouse(lin, MouseConstants.left_key);
-        Keyboard.clickKey(lin, KeyEvent.VK_1);      Software.hold(10);
-        Software.hold(10);
-      }
-    }
-  }
-  @Override
-  public void run() {
-    System.out.println("Task starts");
-    while(true){
-      if(running){
-        performTasks();
-      }
-      System.out.println("press key");
-    }
-  }
+	private void performTasks() throws InterruptedException {
+		for (String nextTask : this.tasks) {
+			String[] taskDetail = nextTask.split(", ");
+			if (taskDetail[0].equals("mouse")) {
+				//System.out.println("Clicking mouse");
+				// Mouse.clickMouse(lin, MouseConstants.left_key);
+				Keyboard.clickKey(lin, KeyboardCostants.No1);
+				Software.hold(100);
+			}
+		}
+	}
 
-  private void initializeLin(){
-    try {
-      lin = new Robot();
-    } catch (AWTException e) {
-      System.out.println("Cant find lin");
-      e.printStackTrace();
-    }
-  }
+	@Override
+	public void run() {
+		System.out.println("Task starts");
+		occupied = true;
+		while (occupied) {
+			try {
+				performTasks();
+			} catch (InterruptedException e) {
+				return;
+			}
+		}
+		return;
+	}
+
+	@Override
+	public void interrupt() {
+		System.out.println("quit");
+		occupied = false;
+		return;
+	}
+	
+	private void initializeLin() {
+		try {
+			lin = new Robot();
+		} catch (AWTException e) {
+			System.out.println("Cant find lin");
+			e.printStackTrace();
+		}
+	}
+	
+	public void addTask(String newTask) {
+		this.tasks.add(newTask);
+	}
+	
+	public void clearTask() {
+		this.tasks.clear();
+	}
 }
