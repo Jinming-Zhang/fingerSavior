@@ -52,6 +52,9 @@ public class Frame extends Application {
 	@Override
 	public void stop() {
 		lin.interrupt();
+		lin.myState();
+		lin.interrupt();
+		lin.myState();
 		System.exit(0);
 	}
 
@@ -60,8 +63,8 @@ public class Frame extends Application {
 		keyNo1.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
-				String linState = lin.getState().toString();
-				System.out.println("State of Lin: " + linState);
+				lin.myState();
+
 				//if(!linState.equals("TERMINATED")) {
 					lin.interrupt();
 				//}
@@ -89,6 +92,7 @@ public class Frame extends Application {
 			@Override
 			public void handle(MouseEvent event) {
 					lin.interrupt();
+					lin.myState();
 			}
 		});
 	}

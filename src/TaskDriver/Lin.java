@@ -73,4 +73,9 @@ public class Lin extends Thread {
 	public void clearTask() {
 		this.tasks.clear();
 	}
+	
+	public String myState() {
+		System.out.println("Hi I'm " + this.getState().toString());
+		return this.getState().toString();
+	}
 }
