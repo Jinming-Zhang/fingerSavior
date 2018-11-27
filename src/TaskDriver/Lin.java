@@ -6,7 +6,9 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
 import constants.KeyboardCostants;
+import constants.MouseConstants;
 import keyboards.Keyboard;
+import mouse.Mouse;
 import system.Software;
 
 public class Lin extends Thread {
@@ -18,15 +20,16 @@ public class Lin extends Thread {
 		occupied = false;
 		tasks = new ArrayList<String>(5);
 		initializeLin();
-		tasks.add("mouse, click, 10");
 	}
 
 	private void performTasks() throws InterruptedException {
 		for (String nextTask : this.tasks) {
 			String[] taskDetail = nextTask.split(",");
-			if (taskDetail[0].trim().equals("mouse")) {
-				//System.out.println("Clicking mouse");
-				// Mouse.clickMouse(lin, MouseConstants.left_key);
+			String device = taskDetail[0].trim();
+			if (device.equalsIgnoreCase("mouse")) {
+				Mouse.clickMouse(lin, MouseConstants.left_key);
+			}
+			else if(device.equalsIgnoreCase("key")) {
 				Keyboard.clickKey(lin, KeyboardCostants.No1);
 			}
 			else if(taskDetail[0].trim().equalsIgnoreCase("sleep")) {

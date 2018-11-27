@@ -1,11 +1,18 @@
 package gui;
 
+import java.util.ArrayList;
+
 import TaskDriver.Lin;
+import constants.Layout;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.input.*;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 import javafx.scene.*;
 import javafx.scene.control.*;
@@ -13,7 +20,9 @@ import javafx.scene.control.*;
 public class Frame extends Application {
 	// elements in the frame
 	private Lin lin;
-
+	
+	private ArrayList<String> newTasks;
+	
 	public Button mouse, keyNo1;
 	public Button start, terminate;
 
@@ -35,26 +44,52 @@ public class Frame extends Application {
 		tasks.setPrefSize(250, 75);
 
 		lin = new Lin();
+		newTasks = new ArrayList<String>();
 	}
 
 	@Override
 	public void start(Stage stg) throws Exception {
 		initialize();
 
+		enableMouseButton();
 		enableKeyButton();
 		enableTerminateButton();
 		enableStartButton();
+		
+		// start / terminate
+		HBox performer = new HBox();
+		//HBox.set
+		//performer.setMinWidth(Layout.FrameWidth);
+		performer.getChildren().addAll(start, terminate);
+		performer.setSpacing((Layout.FrameWidth - 100) / 2);
+		// task design pane
+		GridPane taskCreater = new GridPane();
+		//setupGridPane(taskCreater);
+		//taskCreater.setMinWidth(Layout.FrameHeight / 2);
+		taskCreater.add(mouse, 0, 0);
+		taskCreater.add(keyNo1, 0, 1);
+		taskCreater.add(restTimeLabel, 1, 0);
+		taskCreater.add(restTime, 1, 1);
+		taskCreater.setGridLinesVisible(true);
+		// task view pane
+		GridPane taskViewer= new GridPane();
+		//setupGridPane(taskViewer);
+		//taskViewer.setMinWidth(Layout.FrameHeight / 2);
+		taskViewer.add(tasks, 0, 0);
+		taskViewer.setGridLinesVisible(true);
 		// Root Scene node
-		GridPane root = new GridPane();
-		root.setMinSize(600, 300);
-		root.add(keyNo1, 0, 0);
-		root.add(terminate, 0, 1);
-		root.add(start, 0, 2);
-		root.add(restTimeLabel, 2, 0);
-		root.add(restTime, 2, 1);
-		root.add(tasks, 3, 0);
+		FlowPane root = new FlowPane();
+		//setupGridPane(root);
+		
+		//root.setMinSize(600, 300);
+		root.getChildren().addAll(taskCreater, taskViewer,performer);
+		/*add(taskCreater, 0, 0);
+		root.add(taskViewer, 1, 0);
+		root.add(performer, 0, 1);
+		root.setGridLinesVisible(true);*/
+
 		// Scene
-		Scene scene = new Scene(root, 600, 300);
+		Scene scene = new Scene(root, Layout.FrameWidth, Layout.FrameHeight);
 		// Stage
 		stg.setScene(scene);
 		refreshTaskBoard();
@@ -75,11 +110,9 @@ public class Frame extends Application {
 		keyNo1.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
-				lin.myState();
-				lin.interrupt();
-				lin = new Lin();
 				// add tasks
-				lin.addTask("sleep," + restTime.getText());
+				newTasks.add("key");
+				newTasks.add("sleep," + restTime.getText());
 				refreshTaskBoard();
 			}
 		});
@@ -90,7 +123,9 @@ public class Frame extends Application {
 
 			@Override
 			public void handle(MouseEvent event) {
-				lin.addTask("mouse, click, " + restTime.getText());
+				newTasks.add("mouse, click, " + restTime.getText());
+				newTasks.add("sleep," + restTime.getText());
+				refreshTaskBoard();
 			}
 		});
 	}
@@ -110,16 +145,33 @@ public class Frame extends Application {
 		start.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
-				lin.interrupt();
+				if (lin.getState() != Thread.State.TERMINATED) {
+					lin.interrupt();
+				}
+				lin = new Lin();
+				for(String nextTask: newTasks) {
+					lin.addTask(nextTask);
+				}
 				refreshTaskBoard();
 				lin.start();
-
 			}
 		});
 	}
 
+	/************************ layouts ***********************************/
+	private void setupGridPane(GridPane gp) {
+		gp.setPadding(new Insets(10, 10, 10, 10));
+		gp.setVgap(5); 
+		gp.setHgap(5); 
+		gp.setAlignment(Pos.CENTER); 
+	}
 	/************************ help functions ***********************************/
 	private void refreshTaskBoard() {
-		tasks.appendText(lin.myTasks());
+		String linJob = "";
+		for(String job: newTasks) {
+			linJob += job;
+			linJob += '\n';
+		}
+		tasks.setText(linJob);
 	}
 }
